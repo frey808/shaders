@@ -26,7 +26,7 @@ vec3 rgb2hsb(in vec3 c){
   vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
   vec4 p = mix(
     vec4(c.bg, K.wz),
-    vec4(c.gb, K.xy),
+    vec4(c.gb, K.st),
     step(c.b, c.g));
   vec4 q = mix(
     vec4(p.xyw, c.r),
@@ -41,19 +41,19 @@ vec3 rgb2hsb(in vec3 c){
   );
 }
 
-vec2 car2pol(in vec2 xy){
-  vec2 toCenter = vec2(0.5)-xy;
+vec2 car2pol(in vec2 st){
+  vec2 toCenter = vec2(0.5)-st;
   float angle = (atan(toCenter.y,toCenter.x)+PI)/(2.0*PI);
   float radius = length(toCenter)*2.0;
   return vec2(angle, radius);
 }
 
 void main() {
-	vec2 xy = gl_FragCoord.xy/u_resolution;
+	vec2 st = gl_FragCoord.st/u_resolution;
   //map functions:
-  // xy = car2pol(xy);
+  // st = car2pol(st);
 
-  vec3 color = hsb2rgb(vec3(xy, 1.0));
+  vec3 color = hsb2rgb(vec3(st, 1.0));
   //color functions:
   // color = rgb2hsb(color);
 

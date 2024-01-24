@@ -14,14 +14,14 @@ float plot(vec2 st, float pct){
 }
 
 void main() {
-	vec2 st = gl_FragCoord.xy/u_resolution;
+	vec2 st = gl_FragCoord.st/u_resolution;
 
-  //shaper function
-  float y = st.x;
+  //shaper function on st.x
+  float y = sin(st.x*PI);
 
   vec3 color = vec3(y);
   float pct = plot(st, y);
-  color = (1.0-pct)*color+pct*vec3(0.0,1.0,0.0);
+  color = (1.0-pct)*color+pct*vec3(0.0,1.0,1.0);
 
 	gl_FragColor = vec4(color,1.0);
 }
