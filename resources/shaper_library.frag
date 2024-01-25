@@ -8,19 +8,20 @@ uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 uniform float u_time;
 
-//display shaper functions
-float plot(vec2 st, float pct){
-  return smoothstep(pct-0.02, pct, st.y) - smoothstep(pct, pct+0.02, st.y);
-}
+//sine arc
+  // sin(st.x*PI);
+
+//coiling lines
+  // mod(9.0*st.x, 1.0);
 
 void main() {
 	vec2 st = gl_FragCoord.st/u_resolution;
 
   //shaper function on st.x
-  float y = sin(st.x*PI);
+  float y = mod(9.0*st.x, 1.0);
 
   vec3 color = vec3(y);
-  float pct = plot(st, y);
+  float pct = smoothstep(y-0.02, y, st.y) - smoothstep(y, y+0.02, st.y);
   color = (1.0-pct)*color+pct*vec3(0.0,1.0,1.0);
 
 	gl_FragColor = vec4(color,1.0);

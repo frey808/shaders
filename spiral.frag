@@ -7,7 +7,7 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-vec3 hsb2rgb( in vec3 c ){
+vec3 hsb2rgb(in vec3 c){
   vec3 rgb = clamp(
     abs(
       mod(
@@ -28,13 +28,20 @@ vec2 car2pol(in vec2 st){
   return vec2(angle, radius);
 }
 
+float plot(float axis, float pct){
+  return smoothstep(pct-0.1, pct, axis) - smoothstep(pct, pct+0.1, axis);
+}
+
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
-  vec3 color = vec3(0.0);
 
   st = car2pol(st);
-  st.x += u_time/10.0;
-  color = hsb2rgb(vec3(st,1.0));
 
+  float x = mod(5.0*st.y-mod(u_time, 1.0), 1.0);
+  float pct = plot(st.x, x);
+
+  vec3 rainbow = hsb2rgb(vec3(mod(u_time-st.y*3.0, 1.0), 1.0, 1.0));
+  vec3 color = vec3(pct * rainbow);
+  
   gl_FragColor = vec4(color,1.0);
 }
