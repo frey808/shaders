@@ -29,14 +29,12 @@ vec2 car2pol(in vec2 st){
 }
 
 void main(){
-    vec2 st = car2pol(gl_FragCoord.st/u_resolution);
-    vec3 color = vec3(0.0);
+  vec2 st = gl_FragCoord.st/u_resolution;
+  vec3 color = vec3(0.0);
 
-    //spin
-    st.x += u_time/10.0;
+  st = car2pol(st);
+  st.x += u_time/10.0;
+  color = hsb2rgb(vec3(st,1.0));
 
-    // map st to hue and saturation
-    color = hsb2rgb(vec3(st,1.0));
-
-    gl_FragColor = vec4(color,1.0);
+  gl_FragColor = vec4(color,1.0);
 }
