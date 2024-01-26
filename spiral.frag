@@ -29,6 +29,9 @@ vec2 car2pol(in vec2 st){
 }
 
 float plot(float axis, float pct){
+  if(axis-pct > 0.93 || axis-pct < -0.93){
+    axis = 1.0-axis;
+  }
   return smoothstep(pct-0.1, pct, axis) - smoothstep(pct, pct+0.1, axis);
 }
 
@@ -37,7 +40,7 @@ void main(){
 
   st = car2pol(st);
 
-  float x = mod(5.0*st.y-mod(u_time, 1.0), 1.0);
+  float x = mod(5.0*st.y-u_time, 1.0);
   float pct = plot(st.x, x);
 
   vec3 rainbow = hsb2rgb(vec3(mod(u_time-st.y*3.0, 1.0), 1.0, 1.0));
