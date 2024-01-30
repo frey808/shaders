@@ -46,7 +46,7 @@ void main(){
   vec4 image = texture2D(u_tex0, st);
 
   vec3 hsb_image = rgb2hsb(image.rgb);
-  hsb_image.r = mod(hsb_image.r+u_time, 1.0);
+  hsb_image.r = fract(hsb_image.r+u_time);
   image.rgb = hsb2rgb(hsb_image);
 
   gl_FragColor = vec4(image);

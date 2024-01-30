@@ -40,10 +40,10 @@ void main(){
 
   st = car2pol(st);
 
-  float x = mod(5.0*st.y-u_time, 1.0);
+  float x = fract(5.0*st.y-u_time);
   float pct = plot(st.x, x);
 
-  vec3 rainbow = hsb2rgb(vec3(mod(u_time-st.y*3.0, 1.0), 1.0, 1.0));
+  vec3 rainbow = hsb2rgb(vec3(fract(u_time-st.y*3.0), 1.0, 1.0));
   vec3 color = vec3(pct * rainbow);
   
   gl_FragColor = vec4(color,1.0);

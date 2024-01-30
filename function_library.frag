@@ -51,6 +51,16 @@ vec2 car2pol(in vec2 st){
   return vec2(angle, radius);
 }
 
+//dot product circle
+float circle(in vec2 st, vec2 c, float r){
+  vec2 dist = st-c;
+	return 1.0-smoothstep(
+    r-(r*0.01),
+    r+(r*0.01),
+    dot(dist,dist)*4.0
+  );
+}
+
 void main() {
 	vec2 st = gl_FragCoord.st/u_resolution;
   //map functions:
