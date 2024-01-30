@@ -51,6 +51,20 @@ vec2 car2pol(in vec2 st){
   return vec2(angle, radius);
 }
 
+//shaped distance from center
+float polygon(in vec2 st, vec2 c, float n){
+  st = (st-c);
+  float a = atan(st.x,st.y)+PI;
+  float r = 2.0*PI/float(n);
+  return cos(floor(0.5+a/r)*r-a)*length(st)*2.0;
+}
+
+//draw box
+float box(vec2 st, vec2 bl, vec2 tr){
+  vec2 ns = step(bl,st)*step(st,tr);
+  return 1.0-(ns.x*ns.y);
+}
+
 //dot product circle
 float circle(in vec2 st, vec2 c, float r){
   vec2 dist = st-c;
