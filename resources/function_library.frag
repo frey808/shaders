@@ -51,18 +51,6 @@ vec2 car2pol(in vec2 st){
   return vec2(angle, radius);
 }
 
-//plot function lines
-float plot(float axis, float pct){
-  return smoothstep(pct-0.02, pct, axis) - smoothstep(pct, pct+0.02, axis);
-}
-
-//draw square
-float square(vec2 st, vec2 bottom_left, vec2 top_right){
-  vec2 bl = step(bottom_left, st);
-  vec2 tr = step(st, top_right);
-  return 1.0-bl.x*bl.y*tr.x*tr.y;
-}
-
 void main() {
 	vec2 st = gl_FragCoord.st/u_resolution;
   //map functions:
@@ -71,7 +59,6 @@ void main() {
   vec3 color = hsb2rgb(vec3(st, 1.0));
   //color functions:
   // color = rgb2hsb(color);
-  // color *= 1.0-square(st, vec2(0.3, 0.4), vec2(0.9, 0.8));
 
 	gl_FragColor = vec4(color,1.0);
 }
