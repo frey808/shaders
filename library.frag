@@ -134,12 +134,6 @@ vec2 scale(vec2 st, vec2 scale){
   return st;
 }
 
-//multiply space into a grid
-vec2 tile(vec2 st, float dim){
-    st *= dim;
-    return fract(st);
-}
-
 void main() {
 	vec2 st = gl_FragCoord.st/u_resolution;
   //map functions:
