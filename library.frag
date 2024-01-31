@@ -71,6 +71,7 @@ float place_polygon(in vec2 st, vec2 c, float n){
 }
 
 float polygon(in vec2 st, float n){
+  st -= 0.5;
   float a = atan(st.x,st.y)+PI;
   float r = 2.0*PI/float(n);
   return cos(floor(0.5+a/r)*r-a)*length(st)*2.0;
