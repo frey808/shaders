@@ -3,6 +3,7 @@ precision mediump float;
 #endif
 
 #define PI 3.14159265359
+#define PI2 6.283158530718
 
 uniform vec2 u_resolution;
 
@@ -57,7 +58,7 @@ mat3 rgb2yuv = mat3(
 //convert cartesian to polar coords
 vec2 car2pol(in vec2 st){
   vec2 tc = vec2(0.5)-st;
-  float a = (atan(tc.y,tc.x)+PI)/(2.0*PI);
+  float a = (atan(tc.y,tc.x)+PI)/PI2;
   float radius = length(tc)*2.0;
   return vec2(a, radius);
 }
@@ -66,14 +67,14 @@ vec2 car2pol(in vec2 st){
 float place_polygon(in vec2 st, vec2 c, float n){
   st = (st-c);
   float a = atan(st.x,st.y)+PI;
-  float r = 2.0*PI/float(n);
+  float r = PI2/float(n);
   return cos(floor(0.5+a/r)*r-a)*length(st)*2.0;
 }
 
 float polygon(in vec2 st, float n){
   st -= 0.5;
   float a = atan(st.x,st.y)+PI;
-  float r = 2.0*PI/float(n);
+  float r = PI2/float(n);
   return cos(floor(0.5+a/r)*r-a)*length(st)*2.0;
 }
 
@@ -89,6 +90,20 @@ float box(vec2 st, vec2 wh){
   return uv.x*uv.y;
 }
 
+//draw polyhedron
+float polyhedron(vec2 st, int n){
+  st = car2pol(st);
+  float y = 0.1+pow(fract(st.x*int(n))-0.5,2.9);
+  return step(st.y,y);
+}
+
+float place_polyhedron(vec2 st, vec2 c, int n){
+  st -= c-0.5;
+  st = car2pol(st);
+  float y = 0.1+pow(fract(st.x*float(n))-0.5,2.9);
+  return step(st.y,y);
+}
+
 //dot product circle
 float circle(in vec2 st, vec2 c, float r){
   vec2 dist = st-c;
@@ -99,7 +114,7 @@ float circle(in vec2 st, vec2 c, float r){
   );
 }
 
-//rotating matrices
+//rotating coordinates
 mat2 rotate_mat(float a){
   return mat2(
     cos(a),-sin(a),
@@ -117,7 +132,11 @@ vec2 rotate2d(vec2 st, float a){
   return st;
 }
 
-//scaling matrices
+//scaling coordinates
+vec2 scale(vec2 st, vec2 s){
+  return (st-0.5)/s+0.5;
+}
+
 mat2 scale_mat(vec2 scale){
   return mat2(
     scale.x,0.0,
