@@ -8,6 +8,8 @@ precision mediump float;
 uniform float u_time;
 uniform vec2 u_resolution;
 
+const float slow = 2.0;
+const float interval = 0.25;
 const vec3 white = vec3(0.8,0.8,0.8);
 const vec3 grey = vec3(0.6,0.6,0.6);
 const vec3 green = vec3(0.7,0.9,0.8);
@@ -43,6 +45,7 @@ vec3 star(vec2 st, vec2 c, float a, int n, vec3 color){
   st = car2pol(st);
   
   float y = 0.1+pow(fract(st.x*float(n))-0.5,2.9);
+  // float y = 0.1+pow(fract(st.x*float(n))-0.5,2.0); //fix for if stars render poorly
   return smoothstep(y+0.15,y,st.y)*color+smoothstep(y+0.05,y-0.05,st.y)*(1.0-color);
 }
 
@@ -66,7 +69,7 @@ vec3 layer(vec2 st, float z, float a){
 }
 
 float zoom(float i){
-  return pow(2.0, fract((u_time+i)/5.0)*3.0)-1.0;
+  return pow(2.0, fract((u_time+i)/slow)*3.0)-1.0;
 }
 
 void main(){
@@ -75,10 +78,10 @@ void main(){
 
   // color += layer(st, 1.0, 0.0*PI2);
 
-  for(float i = 0.0;i < 10.0;i++){
-    color += layer(st, zoom(i*0.5), fract(i*0.7)*PI2);
+  for(float i = 0.0;i < slow/interval;i++){
+    color += layer(st, zoom(i*interval), fract(i*0.7)*PI2);
   }
 
-  color.b = abs(color.b+0.15);
+  color.b = abs(color.b+0.05);
   gl_FragColor = vec4(color, 1.0);
 }
