@@ -11,7 +11,6 @@ const float n_bars = 25.0; //will only work with odd numbers
 const float space_between = 0.01;
 const float max_h = 0.7;
 const float min_h = 0.1;
-const float u_aspect = 0.5;
 
 float bar(vec2 st, vec2 wh){
   float radius = wh.x*0.5;
@@ -26,19 +25,17 @@ void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
   vec3 color = vec3(st,1.0);
 
-  float u_wave = fract(u_time/3.0);
-  float u_flag = step(mod(u_time/3.0,2.0),1.0);
+  float cycle = fract(u_time/3.0);
+  float flag = step(mod(u_time/3.0,2.0),1.0);
   float mid = floor(n_bars/2.0);
-  float cycle = (u_flag*u_wave+(1.0-u_flag)*u_wave)*u_aspect;
 
-    st.x += (1.0/n_bars)*mid;
-    for(float i = 0.0;i < n_bars;i++){
-      float offset = fract(cycle+(i-mid+n_bars*step(i,mid))/n_bars);
-      float skew = ((0.5+offset/u_aspect)*step(offset,u_aspect)+(1.5+(offset-u_aspect)/(1.0-u_aspect))*step(u_aspect,offset))*(1.0-u_flag*2.0);
-      float opacity = 0.5+0.5*(1.0+floor(-abs(mid-i)/n_bars));
-      color += (1.0-color)*opacity*bar(st,vec2(1.0/n_bars-space_between,mix(min_h,max_h,((sin(skew*PI)+1.0)/2.0)*(max_h-min_h)+min_h)));
-      st.x -= (1.0/n_bars);
-    }
+  st.x += (1.0/n_bars)*mid;
+  for(float i = 0.0;i < n_bars;i++){
+    float offset = 0.5+fract(cycle+i/n_bars)*2.0;
+    float opacity = 0.5+0.5*(1.0+floor(-abs(mid-i)/n_bars));
+    color += (1.0-color)*opacity*bar(st,vec2(1.0/n_bars-space_between,mix(min_h,max_h,((sin(offset*PI)+1.0)/2.0)*(max_h-min_h)+min_h)));
+    st.x -= (1.0/n_bars);
+  }
 
   gl_FragColor = vec4(color, 1.0);
 }

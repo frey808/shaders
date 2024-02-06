@@ -8,7 +8,11 @@ precision mediump float;
 uniform float u_time;
 uniform vec2 u_resolution;
 
-const float brush = 0.01;
+const float n_rings = 25;
+const float min_r = 0.3;
+const float max_r = 0.6;
+const float brush = 0.005;
+const float delay = 0.01; //must be less than 1.0/n_rings
 
 vec2 car2pol(vec2 st){
   vec2 tc = vec2(0.5)-st;
@@ -28,20 +32,27 @@ vec2 rotate(vec2 st, float a){
 }
 
 float ring(vec2 st, float wave){
-  st = rotate(st,sin((wave-0.5)*PI)*2.0);
+  st = rotate(st,-wave);
   st = car2pol(st);
-  float y = 0.5+sin(st.x*7.0*PI2)*0.05*(wave*2.0-1.0);
+  float r = min_r+(max_r-min_r)*wave;
+  float distortion = sin(st.x*5.0*PI2)*0.1*(0.5-abs(wave-0.5));
+  float y = r+distortion;
   return step(st.y,y)*step(y-brush,st.y);
 }
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
-  vec3 color = vec3(st.x*1.3,1.0,st.y*1.3);
+  vec3 color = vec3(st.x*st.y,st.y,1.0);
   
-  float u_wave = 1.0-abs(fract(u_time/6.0)-0.5)*2.0;
-  float u_flag = step(fract(u_time/6.0),0.5);
+  float cycle = fract(u_time/3.0);
+  float flag = step(fract(u_time/6.0),0.5);
 
-  color += (vec3(st,1.0)-color)*ring(st,u_wave);
+  for(float i = 0.0;i < n_rings;i++){
+    float offset = abs(cycle-delay*i);
+    float wave = flag*offset+(1.0-flag)*(1.0-offset);
+    float easing = smoothstep(0.2,0.8,wave);
+    color += (1.0-color)*ring(st,easing);
+  }
 
   gl_FragColor = vec4(color, 1.0);
 }
