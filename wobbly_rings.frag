@@ -13,6 +13,8 @@ const float min_r = 0.3;
 const float max_r = 0.6;
 const float brush = 0.005;
 const float delay = 0.01; //must be less than 1.0/n_rings
+const float randomness = 20.0;
+const float distortion = 0.25;
 
 vec2 car2pol(vec2 st){
   vec2 tc = vec2(0.5)-st;
@@ -34,9 +36,10 @@ vec2 rotate(vec2 st, float a){
 float ring(vec2 st, float wave){
   st = rotate(st,-wave);
   st = car2pol(st);
-  float r = min_r+(max_r-min_r)*wave;
-  float distortion = sin(st.x*5.0*PI2)*0.1*(0.5-abs(wave-0.5));
-  float y = r+distortion;
+  // float warp = sin(st.x*5.0*PI2); //uniform warping
+  float x = st.x*randomness;
+  float warp = mix(fract(sin(floor(x))*1000.0), fract(sin(floor(step(x,randomness-1.0)*(x+1.0)))*1000.0), smoothstep(0.0,1.0,fract(x)))-0.5;
+  float y = min_r+(max_r-min_r)*wave+warp*(0.5-abs(wave-0.5))*distortion;
   return step(st.y,y)*step(y-brush,st.y);
 }
 
