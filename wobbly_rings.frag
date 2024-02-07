@@ -8,7 +8,7 @@ precision mediump float;
 uniform float u_time;
 uniform vec2 u_resolution;
 
-const float n_rings = 25;
+const float n_rings = 25.0;
 const float min_r = 0.3;
 const float max_r = 0.6;
 const float brush = 0.005;
