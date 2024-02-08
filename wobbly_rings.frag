@@ -15,6 +15,7 @@ const float brush = 0.005;
 const float delay = 0.01; //must be less than 1.0/n_rings
 const float randomness = 20.0;
 const float distortion = 0.25;
+const float interval = 3.0;
 
 vec2 car2pol(vec2 st){
   vec2 tc = vec2(0.5)-st;
@@ -38,7 +39,8 @@ float ring(vec2 st, float wave){
   st = car2pol(st);
   // float warp = sin(st.x*5.0*PI2); //uniform warping
   float x = st.x*randomness;
-  float warp = mix(fract(sin(floor(x))*1000.0), fract(sin(floor(step(x,randomness-1.0)*(x+1.0)))*1000.0), smoothstep(0.0,1.0,fract(x)))-0.5;
+  float random = fract(sin(u_time-mod(u_time,interval))*1000.0)*99.0+1.0;
+  float warp = mix(fract(sin(floor(x))*1000.0+random),fract(sin(floor(step(x,randomness-1.0)*(x+1.0)))*1000.0+random),smoothstep(0.0,1.0,fract(x)))-0.5;
   float y = min_r+(max_r-min_r)*wave+warp*(0.5-abs(wave-0.5))*distortion;
   return step(st.y,y)*step(y-brush,st.y);
 }
@@ -47,8 +49,8 @@ void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
   vec3 color = vec3(st.x*st.y,st.y,1.0);
   
-  float cycle = fract(u_time/3.0);
-  float flag = step(fract(u_time/6.0),0.5);
+  float cycle = fract(u_time/interval);
+  float flag = step(fract(u_time/(interval*2.0)),0.5);
 
   for(float i = 0.0;i < n_rings;i++){
     float offset = abs(cycle-delay*i);
