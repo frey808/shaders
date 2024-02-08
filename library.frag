@@ -7,7 +7,7 @@ precision mediump float;
 
 uniform vec2 u_resolution;
 
-//convert hsb to rgb color
+//convert color schemes
 vec3 hsb2rgb(vec3 c){
   vec3 rgb = clamp(
     abs(
@@ -22,7 +22,6 @@ vec3 hsb2rgb(vec3 c){
   return c.z * mix( vec3(1.0), rgb, c.y);
 }
 
-//convert rgb to hsb color
 vec3 rgb2hsb(vec3 c){
   vec4 k = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
   vec4 p = mix(
@@ -42,28 +41,23 @@ vec3 rgb2hsb(vec3 c){
   );
 }
 
-//yuv to rgb matrix
-mat3 yuv2rgb = mat3(1.0, 0.0, 1.13983,
-  1.0, -0.39465, -0.58060,
-  1.0, 2.03211, 0.0
-);
-
-//rgb to yuv matrix
-mat3 rgb2yuv = mat3(
-  0.2126, 0.7152, 0.0722,
-  -0.09991, -0.33609, 0.43600,
-  0.615, -0.5586, -0.05639
-);
-
-//convert cartesian to polar coords
-vec2 car2pol(vec2 st){
-  vec2 tc = vec2(0.5)-st;
-  float a = (atan(tc.y,tc.x)+PI)/PI2;
-  float radius = length(tc)*2.0;
-  return vec2(a, radius);
+vec3 yuv2rgb(vec3 c){
+  return c * mat3(
+    1.0, 0.0, 1.13983,
+    1.0, -0.39465, -0.58060,
+    1.0, 2.03211, 0.0
+  );
 }
 
-//polygon shaped distance from center
+vec3 rgb2yuv(vec3 c){
+  return c * mat3(
+    0.2126, 0.7152, 0.0722,
+    -0.09991, -0.33609, 0.43600,
+    0.615, -0.5586, -0.05639
+  );
+}
+
+//draw polygon
 float place_polygon(vec2 st, vec2 c, float n){
   st = (st-c);
   float a = atan(st.x,st.y)+PI;
@@ -122,14 +116,7 @@ float circle_dot(vec2 st, vec2 c, float r){
   );
 }
 
-//rotating coordinates
-mat2 rotate_mat(float a){
-  return mat2(
-    cos(a),-sin(a),
-    sin(a),cos(a)
-  );
-}
-
+//rotate coordinates
 vec2 rotate(vec2 st, float a){
   st -= 0.5;
   st = mat2(
@@ -140,16 +127,42 @@ vec2 rotate(vec2 st, float a){
   return st;
 }
 
-//scaling coordinates
+//scale coordinates
 vec2 scale(vec2 st, vec2 s){
   return (st-0.5)/s+0.5;
 }
 
-mat2 scale_mat(vec2 scale){
-  return mat2(
-    scale.x,0.0,
-    0.0,scale.y
+vec2 scale_mat(vec2 st, vec2 s){
+  return st*mat2(
+    s.x,0.0,
+    0.0,s.y
   );
+}
+
+//skew coordinates
+vec2 equilateral_skew(vec2 st){
+  return vec2(1.1547*st.x,st.y+0.5*1.1547*st.x);
+}
+
+//convert coordinates
+vec2 car2pol(vec2 st){
+  vec2 tc = vec2(0.5)-st;
+  float a = (atan(tc.y,tc.x)+PI)/PI2;
+  float radius = length(tc)*2.0;
+  return vec2(a, radius);
+}
+
+vec3 simplex_grid(vec2 st){
+  vec3 xyz = vec3(0.0);
+  vec2 p = fract(skew(st));
+  if(p.x > p.y) {
+    xyz.xy = 1.0-vec2(p.x,p.y-p.x);
+    xyz.z = p.y;
+  }else{
+    xyz.yz = 1.0-vec2(p.x-p.y,p.y);
+    xyz.x = p.x;
+  }
+  return fract(xyz);
 }
 
 //random number generation
@@ -167,11 +180,7 @@ vec2 random2d(vec2 st){
 }
 
 //noise generation
-float noise_jagged(float x){
-  return mix(fract(sin(floor(x))*10000.0), fract(sin(floor(x) + 1.0)*10000.0), fract(x));
-}
-
-float noise_wavy(float x){
+float noise1d(float x){
   return mix(fract(sin(floor(floor(x)))*10000.0), fract(sin(floor((floor(x) + 1.0)))*10000.0), smoothstep(0.,1.,fract(x)));
 }
 
@@ -186,7 +195,7 @@ float value_noise(vec2 st) {
   );
 }
 
-float noise(vec2 st){
+float gradient_noise(vec2 st){
   vec2 i = floor(st);
   vec2 f = fract(st);
   vec2 u = f*f*(3.0-2.0*f);
@@ -204,6 +213,57 @@ float noise(vec2 st){
     ),
     u.y
   );
+}
+
+float simplex_noise(vec2 v){
+  const vec4 C = vec4(
+    0.211324865405187,
+    // (3.0-sqrt(3.0))/6.0,
+    0.366025403784439,
+    // 0.5*(sqrt(3.0)-1.0),
+    -0.577350269189626,
+    // -1.0 + 2.0 * C.x,
+    0.024390243902439
+    // 1.0 / 41.0
+  );
+
+  // First corner (x0)
+  vec2 i  = floor(v+dot(v,C.yy));
+  vec2 x0 = v-i+dot(i,C.xx);
+
+  // Other two corners (x1, x2)
+  vec2 i1 = vec2(0.0);
+  i1 = (x0.x > x0.y) ? vec2(1.0,0.0) : vec2(0.0,1.0);
+  vec2 x1 = x0.xy+C.xx-i1;
+  vec2 x2 = x0.xy+C.zz;
+
+  // Do some permutations to avoid truncation effects in permutation
+  i = mod289(i);
+  vec3 p = permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));
+  vec3 m = max(0.5-vec3(
+    dot(x0,x0),
+    dot(x1,x1),
+    dot(x2,x2)
+  ),0.0);
+  m = m*m ;
+  m = m*m ;
+
+  // Gradients: 41 pts uniformly over a line, mapped onto a diamond
+  // The ring size 17*17 = 289 is close to a multiple of 41 (41*7 = 287)
+  vec3 x = 2.0*fract(p*C.www)-1.0;
+  vec3 h = abs(x)-0.5;
+  vec3 ox = floor(x+0.5);
+  vec3 a0 = x-ox;
+
+  // Normalise gradients implicitly by scaling m
+  // Approximation of: m *= inversesqrt(a0*a0 + h*h);
+  m *= 1.79284291400159-0.85373472095314*(a0*a0+h*h);
+
+  // Compute final noise value at P
+  vec3 g = vec3(0.0);
+  g.x = a0.x*x0.x+h.x*x0.y;
+  g.yz = a0.yz*vec2(x1.x,x2.x)+h.yz*vec2(x1.y,x2.y);
+  return 130.0*dot(m, g)*0.5+0.5;
 }
 
 void main() {
