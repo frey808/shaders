@@ -33,12 +33,10 @@ float gradient_noise(vec2 st){
 
 float lavalamp(vec2 st){
   float pct = 0.0;
-  pct += smoothstep(0.6,0.8,gradient_noise(10.0*vec2(st.x,st.y*0.5-u_time/10.0)));
-  pct += smoothstep(0.58,0.8,gradient_noise(9.0*vec2(st.x,st.y*0.5-u_time/20.0)));
-  pct += smoothstep(0.56,0.8,gradient_noise(8.0*vec2(st.x,st.y*0.5-u_time/30.0)));
-  pct += smoothstep(0.54,0.8,gradient_noise(7.0*vec2(st.x,st.y*0.5-u_time/40.0)));
-  pct += smoothstep(0.52,0.8,gradient_noise(6.0*vec2(st.x,st.y*0.5-u_time/50.0)));
-  pct += smoothstep(0.5,0.8,gradient_noise(5.0*vec2(st.x,st.y*0.5-u_time/60.0)));
+  float speed = u_time/10.0+10.0;
+  for(float i = 0.0;i < 6;i++){
+    pct += smoothstep(0.6-0.02*i,0.8,gradient_noise((10.0-i)*vec2(st.x,st.y*0.5-speed/(i+1.0))));
+  }
   return smoothstep(0.5,0.55,pct);
 }
 

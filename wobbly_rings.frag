@@ -8,11 +8,11 @@ precision mediump float;
 uniform float u_time;
 uniform vec2 u_resolution;
 
-const float n_rings = 25.0;
+const float n_rings = 15.0;
 const float min_r = 0.3;
 const float max_r = 0.6;
 const float brush = 0.005;
-const float delay = 0.01; //must be less than 1.0/n_rings
+const float delay = 0.02; //must be less than 1.0/n_rings
 const float randomness = 20.0;
 const float distortion = 0.25;
 const float interval = 3.0;
