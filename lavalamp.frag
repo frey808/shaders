@@ -37,12 +37,11 @@ float lavalamp(vec2 st){
   for(float i = 0.0;i < 6;i++){
     pct += smoothstep(0.6-0.02*i,0.8,gradient_noise((10.0-i)*vec2(st.x,st.y*0.5-speed/(i+1.0))));
   }
-  return smoothstep(0.5,0.55,pct);
+  return smoothstep(0.5,0.51,pct);
 }
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
-  vec2 um = u_mouse/u_resolution;
   vec3 color = vec3(max(st.x,st.y)+(1.0-max(st.x,st.y))*0.15,(st.x*st.y+st.y)*0.5,st.y*st.x*0.5);
   color += (vec3(1.0,min(st.x*st.y+st.y,1.0),st.x*st.y)-color)*lavalamp(st);
 

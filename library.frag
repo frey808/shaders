@@ -57,6 +57,55 @@ vec3 rgb2yuv(vec3 c){
   );
 }
 
+//rotate coordinates
+vec2 rotate(vec2 st, float a){
+  st -= 0.5;
+  st = mat2(
+    cos(a),-sin(a),
+    sin(a),cos(a)
+  ) * st;
+  st += 0.5;
+  return st;
+}
+
+//scale coordinates
+vec2 scale(vec2 st, vec2 s){
+  return (st-0.5)/s+0.5;
+}
+
+vec2 scale_mat(vec2 st, vec2 s){
+  return st*mat2(
+    s.x,0.0,
+    0.0,s.y
+  );
+}
+
+//skew coordinates
+vec2 equilateral_skew(vec2 st){
+  return vec2(1.1547*st.x,st.y+0.5*1.1547*st.x);
+}
+
+//convert coordinates
+vec2 car2pol(vec2 st){
+  vec2 tc = vec2(0.5)-st;
+  float a = (atan(tc.y,tc.x)+PI)/PI2;
+  float radius = length(tc)*2.0;
+  return vec2(a, radius);
+}
+
+vec3 simplex_grid(vec2 st){
+  vec3 xyz = vec3(0.0);
+  vec2 p = fract(equilateral_skew(st));
+  if(p.x > p.y) {
+    xyz.xy = 1.0-vec2(p.x,p.y-p.x);
+    xyz.z = p.y;
+  }else{
+    xyz.yz = 1.0-vec2(p.x-p.y,p.y);
+    xyz.x = p.x;
+  }
+  return fract(xyz);
+}
+
 //draw polygon
 float place_polygon(vec2 st, vec2 c, float n){
   st = (st-c);
@@ -116,55 +165,6 @@ float circle_dot(vec2 st, vec2 c, float r){
   );
 }
 
-//rotate coordinates
-vec2 rotate(vec2 st, float a){
-  st -= 0.5;
-  st = mat2(
-    cos(a),-sin(a),
-    sin(a),cos(a)
-  ) * st;
-  st += 0.5;
-  return st;
-}
-
-//scale coordinates
-vec2 scale(vec2 st, vec2 s){
-  return (st-0.5)/s+0.5;
-}
-
-vec2 scale_mat(vec2 st, vec2 s){
-  return st*mat2(
-    s.x,0.0,
-    0.0,s.y
-  );
-}
-
-//skew coordinates
-vec2 equilateral_skew(vec2 st){
-  return vec2(1.1547*st.x,st.y+0.5*1.1547*st.x);
-}
-
-//convert coordinates
-vec2 car2pol(vec2 st){
-  vec2 tc = vec2(0.5)-st;
-  float a = (atan(tc.y,tc.x)+PI)/PI2;
-  float radius = length(tc)*2.0;
-  return vec2(a, radius);
-}
-
-vec3 simplex_grid(vec2 st){
-  vec3 xyz = vec3(0.0);
-  vec2 p = fract(skew(st));
-  if(p.x > p.y) {
-    xyz.xy = 1.0-vec2(p.x,p.y-p.x);
-    xyz.z = p.y;
-  }else{
-    xyz.yz = 1.0-vec2(p.x-p.y,p.y);
-    xyz.x = p.x;
-  }
-  return fract(xyz);
-}
-
 //random number generation
 float random(float x){
   return fract(sin(floor(x))*10000.0);
@@ -213,6 +213,17 @@ float gradient_noise(vec2 st){
     ),
     u.y
   )*0.5+0.5;
+}
+
+//idek man
+vec3 mod289(vec3 x){
+  return x-floor(x*(1.0/289.0))*289.0;
+}
+vec2 mod289(vec2 x){
+  return x-floor(x*(1.0/289.0))*289.0;
+}
+vec3 permute(vec3 x){
+  return mod289(((x*34.0)+1.0)*x);
 }
 
 float simple_noise(vec2 v){
@@ -265,11 +276,6 @@ float simple_noise(vec2 v){
   g.yz = a0.yz*vec2(x1.x,x2.x)+h.yz*vec2(x1.y,x2.y);
   return 130.0*dot(m, g)*0.5+0.5;
 }
-
-//idek man
-vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
-vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;}
-vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
 
 void main() {
 	vec2 st = gl_FragCoord.st/u_resolution;
