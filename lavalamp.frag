@@ -34,7 +34,7 @@ float gradient_noise(vec2 st){
 float lavalamp(vec2 st){
   float pct = 0.0;
   float speed = u_time/10.0+10.0;
-  for(float i = 0.0;i < 6;i++){
+  for(float i = 0.0;i < 6.0;i++){
     pct += smoothstep(0.6-0.02*i,0.8,gradient_noise((10.0-i)*vec2(st.x,st.y*0.5-speed/(i+1.0))));
   }
   return smoothstep(0.5,0.51,pct);
