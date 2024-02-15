@@ -26,6 +26,7 @@ float box(vec2 st, vec2 bl, vec2 tr){
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
 
   st -= offset;
   float cloak = step(radius,polygon(st, vec2(0.5), 3.0))+step(polygon(st, vec2(0.5), 3.0),radius-brush*2.0);

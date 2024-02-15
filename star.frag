@@ -17,6 +17,7 @@ vec2 car2pol(in vec2 st){
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
   st = car2pol(st);
 
   float y = 0.1+pow(fract(st.x*5.0)-0.5,2.9);

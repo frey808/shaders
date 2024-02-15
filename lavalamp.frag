@@ -42,6 +42,7 @@ float lavalamp(vec2 st){
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
   vec3 color = vec3(max(st.x,st.y)+(1.0-max(st.x,st.y))*0.15,(st.x*st.y+st.y)*0.5,st.y*st.x*0.5);
   color += (vec3(1.0,min(st.x*st.y+st.y,1.0),st.x*st.y)-color)*lavalamp(st);
 

@@ -21,6 +21,7 @@ vec2 rotate2d(vec2 st, float a){
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
 
   st *= rows;
   float odd_y = (step(1.0, mod(st.y,2.0))-0.5)*2.0;

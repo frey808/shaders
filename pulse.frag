@@ -12,6 +12,7 @@ float pulse(float x, float k){
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
   vec3 color = vec3(0.0);
 
   vec3 display = vec3(0.0,0.7,0.3);

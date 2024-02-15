@@ -42,6 +42,7 @@ vec3 rgb2hsb(in vec3 c){
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
   vec3 color = vec3(1.0);
   vec4 image = texture2D(u_tex0, st);
 

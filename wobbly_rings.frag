@@ -42,11 +42,12 @@ float ring(vec2 st, float wave){
   float random = fract(sin(u_time-mod(u_time,interval))*1000.0)*99.0+1.0;
   float warp = mix(fract(sin(floor(x))*1000.0+random),fract(sin(floor(step(x,randomness-1.0)*(x+1.0)))*1000.0+random),smoothstep(0.0,1.0,fract(x)))-0.5;
   float y = min_r+(max_r-min_r)*wave+warp*(0.5-abs(wave-0.5))*distortion;
-  return step(st.y,y)*step(y-brush,st.y);
+  return smoothstep(y-brush,y,st.y)-smoothstep(y,y+brush,st.y);
 }
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
   vec3 color = vec3(st.x*st.y,st.y,1.0);
   
   float cycle = fract(u_time/interval);

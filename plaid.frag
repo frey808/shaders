@@ -13,6 +13,7 @@ float stripe(vec2 st, vec2 b, float o){
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
   vec3 color = vec3(0.0);
 
   st = fract(3.0*st);

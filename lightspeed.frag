@@ -80,6 +80,7 @@ vec3 layer(vec2 st, float i){
 
 void main(){
   vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
   vec3 color = vec3(0.0);
 
   // color += layer(st, 1.0, 0.0*PI2);

@@ -287,6 +287,7 @@ float simple_noise(vec2 v){
 
 void main() {
 	vec2 st = gl_FragCoord.st/u_resolution;
+  st.x *= u_resolution.x/u_resolution.y;
   //map functions:
   // st = car2pol(st);
 
