@@ -6,14 +6,11 @@ uniform float u_time;
 uniform vec2 u_resolution;
 
 #define PI 3.14159265359
-#define PI2 6.283158530718
 
 const float n_rings = 5.0;
-const float min_r = 0.3;
-const float max_r = 0.6;
-const float brush = 0.0075;
+const float brush = 0.005;
 const float delay = 0.05;
-const float interval = 3.0;
+const float interval = 2.0;
 
 vec2 random2d(vec2 st){
   st = vec2(dot(st,vec2(127.1,311.7)),dot(st,vec2(269.5,183.3)));
@@ -54,7 +51,8 @@ float ring(vec2 st, float wave, float s){
   st.y = st.y*3.0-1.0+wave*0.5;
   st = (st-0.5)/s+0.5;
   float d = distance(st,vec2(0.5));
-  return smoothstep(0.3-brush/s,0.3,d)-smoothstep(0.3,0.3+brush/s,d);
+  float scale_brush = brush*(1.0-cos((st.x/0.6+0.2)*PI));
+  return smoothstep(0.3-0.005/s,0.3,d)-smoothstep(0.3+scale_brush/s,(0.3+0.005/s)+scale_brush/s,d);
 }
 
 void main(){
@@ -68,7 +66,7 @@ void main(){
   for(float i = 0.0;i < n_rings;i++){
     float offset = abs(cycle-delay*i);
     float wave = flag*offset+(1.0-flag)*(1.0-offset);
-    float easing = smoothstep(0.1,0.9,wave);
+    float easing = smoothstep(0.975,0.025,wave);
     color += (1.0-color)*ring(st,easing*1.5-0.75,(i+1.0)*0.15);
   }
 
@@ -82,7 +80,7 @@ void main(){
   clouds += noise(st*32.0+drift/40.0)/16.0;
   clouds += noise(st*64.0-drift/50.0)/32.0;
 
-  clouds *= smoothstep(0.3,0.7,clouds);
+  clouds *= smoothstep(0.4,0.6,clouds);
   color = mix(color,vec3(1.0),clouds);
 
   gl_FragColor = vec4(color, 1.0);

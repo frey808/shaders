@@ -106,14 +106,7 @@ vec3 simplex_grid(vec2 st){
   return fract(xyz);
 }
 
-//draw polygon
-float place_polygon(vec2 st, vec2 c, float n){
-  st = (st-c);
-  float a = atan(st.x,st.y)+PI;
-  float r = PI2/float(n);
-  return cos(floor(0.5+a/r)*r-a)*length(st)*2.0;
-}
-
+//draw shapes
 float polygon(vec2 st, float n){
   st -= 0.5;
   float a = atan(st.x,st.y)+PI;
@@ -121,39 +114,20 @@ float polygon(vec2 st, float n){
   return cos(floor(0.5+a/r)*r-a)*length(st)*2.0;
 }
 
-//draw boxes
 float box(vec2 st, vec2 wh){
   wh = vec2(0.5)-wh*0.5;
   vec2 uv = step(wh,st)*step(wh,vec2(1.0)-st);
   return uv.x*uv.y;
 }
 
-float place_box(vec2 st, vec2 bl, vec2 tr){
-  vec2 uv = step(bl,st)*step(st,tr);
-  return uv.x*uv.y;
-}
-
-//draw polygram
 float polygram(vec2 st, int n){
   st = car2pol(st);
   float y = 0.1+pow(fract(st.x*float(n))-0.5,2.9);
   return step(st.y,y);
 }
 
-float place_polygram(vec2 st, vec2 c, int n){
-  st -= c-0.5;
-  st = car2pol(st);
-  float y = 0.1+pow(fract(st.x*float(n))-0.5,2.9);
-  return step(st.y,y);
-}
-
-//draw circle
 float cirlce(vec2 st){
   return distance(st,vec2(0.5));
-}
-
-float place_cirlce(vec2 st, vec2 c){
-  return distance(st,c);
 }
 
 float circle_dot(vec2 st, vec2 c, float r){
@@ -163,6 +137,10 @@ float circle_dot(vec2 st, vec2 c, float r){
     r+(r*0.01),
     dot(dist,dist)*4.0
   );
+}
+
+float ellipse(vec2 st, vec2 wh){
+  return (1.0-pow(st.x,2.0)/pow(wh.x,2.0)+pow(st.y,2.0)/pow(wh.y,2.0));
 }
 
 //random number generation
