@@ -107,6 +107,10 @@ vec3 simplex_grid(vec2 st){
 }
 
 //draw shapes
+float line(vecw st, float y){
+  return smoothstep(y-0.02,y,st.y)-smoothstep(y,y+0.02,st.y);
+}
+
 float polygon(vec2 st, float n){
   st -= 0.5;
   float a = atan(st.x,st.y)+PI;
@@ -168,7 +172,7 @@ vec2 random2d(vec2 st){
 
 //noise generation
 float noise1d(float x){
-  return mix(fract(sin(floor(floor(x)))*10000.0), fract(sin(floor((floor(x) + 1.0)))*10000.0), smoothstep(0.,1.,fract(x)));
+  return mix(fract(sin(floor(floor(x)))*10000.0), fract(sin(floor((floor(x) + 1.0)))*10000.0), smoothstep(0.0,1.0,fract(x)));
 }
 
 float value_noise(vec2 st) {
