@@ -153,16 +153,12 @@ float random(float x){
 }
 
 float random_from2d(vec2 st){
-  return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);
+  return fract(sin(st.x*124.0+st.y*215.0)*21412.0);
 }
 
 float random_grid(vec2 st){
   st = vec2(dot(st,vec2(127.1,311.7)),dot(st,vec2(269.5,183.3)));
   return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);
-}
-
-float random_gradient(vec2 st){
-  return fract(sin(st.x*124.0+st.y*215.0)*21412.0);
 }
 
 vec2 random2d(vec2 st){
@@ -199,6 +195,30 @@ float gradient_noise(vec2 st){
     mix(
       dot(random2d(i+vec2(0.0,1.0)),f-vec2(0.0,1.0)),
       dot(random2d(i+vec2(1.0,1.0)),f-vec2(1.0,1.0)),
+      u.x
+    ),
+    u.y
+  )*0.5+0.5;
+}
+
+float loop_noise(vec2 st, float loop){
+  st *= loop;
+  vec2 i = floor(st);
+  vec2 f = fract(st);
+  vec2 u = f*f*(3.0-2.0*f);
+
+  float nx = 1.0-loop*step(loop-1.0,st.x);
+  float ny = 1.0-loop*step(loop-1.0,st.y);
+
+  return mix(
+    mix(
+      dot(random2d(i+vec2(0.0,0.0)),f-vec2(0.0,0.0)),
+      dot(random2d(i+vec2(nx,0.0)),f-vec2(1.0,0.0)),
+      u.x
+    ),
+    mix(
+      dot(random2d(i+vec2(0.0,ny)),f-vec2(0.0,1.0)),
+      dot(random2d(i+vec2(nx,ny)),f-vec2(1.0,1.0)),
       u.x
     ),
     u.y
